@@ -1,0 +1,987 @@
+HOST: http://api.click2stream.com/
+--- Click2Stream API V2 description ---
+---
+Click2stream API is based on __REST__ principles, so all what you have to do is a simple HTTP request to URLs described below. 
+
+Click2Stream API sends and receives JSON encoded objects or plain text message. The base API URL is http://api.click2stream.com/. 
+
+All API operations requires authentication via special HTTP headers <see method examples>. All communications is in UTF8 encoding.
+
+If you want to control you cameras only via API (incl. subscriptions), contact us. Read / write permissions for API objects are based on features available for your camera plan. 
+
+
+Allowed HTTP methods
+--------------------
++    __GET__ : Get information about a resource
++   __PUT__ : Create a resource
++   __POST__ : Update a resource
++   __DELETE__ : Delete a resource
+
+You can search for customers using a variety of criteria. We support three types of search fields
+
++   Red
++ Text Fields
++ Multiple Value Fields
++ Range Fields
+
+
+Description of usual server responses
+-------------------------------------
+* __200 ("OK")__ - the request was successful (some API calls may return 201 instead).
+* __201 ("Created")__ - the request was successful and a resource was created.
+* __204 ("No Content")__ - the request was successful but there is no representation to return (i.e. the response is empty).
+* __400 ("Bad Request")__ - the request could not be understood or was missing required parameters.
+* __401 ("Unauthorized")__ - authentication failed or user doesn't have permissions for requested operation.
+* __403 ("Forbidden")__ - access denied.
+* __404 ("Not Found")__ - resource was not found
+* __405 ("Method Not Allowed")__ - requested method is not supported for resource.
+* __409 (“Conflict”)__ - trying to create resource that is in conflict with some other (i.e. unique email address for new user accounts)
+* __500 ("Unhandled exception")__ - internal application error, should be reported to administrators
+---
+
+
+--
+USER OPERATIONS 
+Describes all available operations with user object. User object properties and its possible values are described below.
+
+User properties:
+---------------------
+
+- __id (int)__ - *__READ-ONLY__ unique identifier of user object*
+- __name (string)__ - *first name of current user*
+- __surname (string)__ - *last name of current user*
+- __shortname (string)__ - *shortname/nickname of current user*
+- __company (string)__ - *users company name* 
+- __street (string)__ - *users street* 
+- __street2 (string)__ - *users street2* 
+- __zip (string)__ - *users zip code* 
+- __city (string)__ - *last name of current user*
+- __country (int)__ - *country id of current user <see country list for possible values>*
+- __state (int)__ - *specifies state of U.S <see state list for possible values>*
+- __created (string)__ - *__READ-ONLY__ date when user object was created in format: __Y-m-d H:i:s__* 
+- __timezone (string)__ - *users timezone in GMT format ie. GMT-11* 
+- __email (string)__ - *users contact email address, also used as login* 
+- __invoiceEmail (string)__ - *users invoicing email address* 
+- __type (string)__ - *__READ-ONLY__ user type* 
+--
+
+List of users
+-------------
+Use this method to get all users bind to your Click2Stream account
+GET /user
+> click2stream-user: your_account@email.tld
+> click2stream-password: your_password
+< 200
+< Content-Type: application/json
+[
+  {
+    "id": "1",
+    "name": "Frank",
+    "surname": "Cool",
+    "shortname": "Wookie",
+    "city": "Orange County",
+    "country": "183",
+    "state": "1",
+    "created": "2011-02-26 11:17:32",
+    "timezone": "GMT",
+    "email": "frank@cool.name",
+    "invoiceEmail": "frank@cool.name",
+    "company": null,
+    "street": "High Road",
+    "street2": "",
+    "type": "user",
+    "zip": "WQ77899"
+  },
+  {
+    "id": "2",
+    "name": "Pavel",
+    "surname": "Novak",
+    "shortname": "Streamer",
+    "city": null,
+    "country": "0",
+    "state": null,
+    "created": null,
+    "timezone": "",
+    "email": "novak@email.cz",
+    "invoiceEmail": null,
+    "company": "My company, s.r.o.",
+    "street": null,
+    "street2": null,
+    "type": "user",
+    "zip": null
+  }
+
+
+User detail
+-----------
+Use this method to return user data via GET method for user specified by idUser parameter in URL.
+
+GET /user/1
+> click2stream-user: your_account@email.tld
+> click2stream-password: your_password
+< 200
+< Content-Type: application/json
+{
+    "id": "1",
+    "name": "Frank",
+    "surname": "Cool",
+    "shortname": "Wookie",
+    "city": "Orange County",
+    "country": "183",
+    "state": "1",
+    "created": "2011-02-26 11:17:32",
+    "timezone": "GMT",
+    "email": "frank@cool.name",
+    "invoiceEmail": "frank@cool.name",
+    "company": null,
+    "street": "High Road",
+    "street2": "",
+    "type": "user",
+    "zip": "WQ77899"
+}
+
+User data update
+----------------
+Use this method to update user data via POST method for user specified by idUser in URL.
+POST /user/1
+> click2stream-user: your_account@email.tld
+> click2stream-password: your_password
+{"name":"Frank","surname":"Cool","city":"City","country":"183","state":"1","timezone":"GMT","invoiceEmail":"frank.cool.name","company":"","street":"High Road","street2":"","zip":"WQ77899"}
+< 200
+< Content-Type: text/plain
+User updated.
+
+
+--
+CAMERA OPERATIONS 
+Describes all available operations with camera object. Camera object properties and its possible values are described below.
+
+Camera properties:
+---------------------
+
+- __idCamera (int)__ - *__READ-ONLY__ unique identifier of camera object*
+- __idUser (int)__ - *__READ-ONLY__ identifier of user camera belongs to*
+- __rtspPath (string)__ - *URL encoded RTSP address of web camera stream or HTTP address of MJPEG stream*
+- __shortname (string)__ - *short name of camera i.e. "N.Y. - Central Park"* 
+- __description (string)__ - *plain text description of your camera stream* 
+- __gps (string)__ - *GPS coords in format N40.640368, W74.0853* 
+- __tags (string)__ - *comma separated list of keywords* 
+- __created (string)__ - *__READ-ONLY__ date when camera was created in format __Y-m-d H:i:s__* 
+- __timezone (string)__ - *camera timezone in numeric format relative to GMT i.e. __-8.0__ for PDT timezone, daylight savings in not implemented*
+- __active (int)__ - *__NOT IMPLEMENTED__ activates/deactivates camera*
+- __player (JSON object)__ - *__OPTIONAL__ contains default player object for camera @see Player object for more information*
+- __id_plan (int)__ - *__READ-ONLY (if not VIP user)__ id of active plan* 
+--
+Camera list
+-----------
+Use this method to return list of all cameras bind to your Click2Stream account. Camera object includes binded player object.
+GET /camera
+> click2stream-user: your_account@email.tld
+> click2stream-password: your_password
+< 200
+< Content-Type: application/json
+[
+  {
+    "idCamera": "1",
+    "idUser": "1",
+    "rtspPath": "rtsp:\/\/217.217.120.120:554\/axis-media\/media.amp",
+    "shortname": "testkamera",
+    "description": "description",
+    "gps": "N40.640368, W74.0853",
+    "tags": "Praha, Zizkov",
+    "watermark": "",
+    "publicPageAddress": "test",
+    "domainAlias": null,
+    "domainLock": "",
+    "shareTwitter": "1",
+    "shareFacebook": "1",
+    "sharePrivateLike": "1",
+    "shareEmail": "1",
+    "playerSkin": "glow",
+    "playerRatio": 16:9,
+    "displayName": "1",
+    "created": "2011-08-23 17:09:11",
+    "idPlan": "1"
+    "player": {
+        "idPlayer":"1",
+        "idCamera":"1",
+        "shareTwitter":"0",
+        "shareFacebook":"0",
+        "sharePrivateLike":"0",
+        "shareEmail":"1",
+        "publicPageAddress":"test",
+        "displayName":"1",
+        "domainLock":"",
+        "playerSkin":"glow2",
+        "playerRatio":"4:3",
+        "playerWidth":"0",
+        "playerHeight":"0",
+        "timeSettingsFrom":"00:00:00",
+        "timeSettingsTo":"00:00:00",
+        "timeSettingsBehaviour":"blank",
+        "timeSettingsActive":"0",
+        "GACode":""
+    }
+  },
+  {
+    "idCamera": "2",
+    "idUser": "1",
+    "rtspPath": "rtsp:\/\/217.217.120.121:554\/axis-media\/media.amp",
+    "shortname": "testkamera2",
+    "description": "This Is Description",
+    "gps": "N40.640368, W74.0853",
+    "tags": "New York, Park",
+    "watermark": "",
+    "publicPageAddress": "ahoj",
+    "domainAlias": null,
+    "domainLock": null,
+    "shareTwitter": "1",
+    "shareFacebook": "1",
+    "sharePrivateLike": "1",
+    "shareEmail": "1",
+    "playerSkin": glow,
+    "playerRatio": null,
+    "displayName": "1",
+    "created": "2011-08-23 17:11:26",
+    "idPlan": "1",
+    "player": {
+        "idPlayer":"2",
+        "idCamera":"2",
+        "shareTwitter":"1",
+        "shareFacebook":"1",
+        "sharePrivateLike":"1",
+        "shareEmail":"1",
+        "publicPageAddress":"ahoj",
+        "displayName":"1",
+        "playerSkin":"",
+        "playerRatio":"",
+        "timeSettingsActive":"0"
+    }
+  }
+]
+
+
+Camera detail
+-------------
+Use this method to return camera incl binded player object via GET method for idCamera specified in URL
+GET /camera/1
+> click2stream-user: your_account@email.tld
+> click2stream-password: your_password
+< 200
+< Content-Type: application/json
+{
+    "idCamera": "1",
+    "idUser": "1",
+    "rtspPath": "rtsp:\/\/217.217.120.120:554\/axis-media\/media.amp",
+    "shortname": "testkamera",
+    "description": "description",
+    "gps": "N40.640368, W74.0853",
+    "tags": "Praha, Zizkov",
+    "watermark": "",
+    "publicPageAddress": "test",
+    "domainAlias": null,
+    "domainLock": "",
+    "shareTwitter": "1",
+    "shareFacebook": "1",
+    "sharePrivateLike": "1",
+    "shareEmail": "1",
+    "playerSkin": "glow",
+    "playerRatio": null,
+    "displayName": "1",
+    "created": "2011-08-23 17:09:11",
+    "idPlan": "1"
+    "player": {
+        "idPlayer":"1",
+        "idCamera":"1",
+        "shareTwitter":"0",
+        "shareFacebook":"0",
+        "sharePrivateLike":"0",
+        "shareEmail":"1",
+        "publicPageAddress":"test",
+        "displayName":"1",
+        "domainLock":"",
+        "playerSkin":"glow2",
+        "playerRatio":"4:3",
+        "playerWidth":"0",
+        "playerHeight":"0",
+        "timeSettingsFrom":"00:00:00",
+        "timeSettingsTo":"00:00:00",
+        "timeSettingsBehaviour":"blank",
+        "timeSettingsActive":"0",
+        "GACode":""
+    }
+}
+
+
+Update Camera
+-------------
+Use this method to update camera data for via POST method for idCamera specified in URL. 
+If you specify player object as part of camera object, both objects will be updated.
+POST /camera/1
+> click2stream-user: your_account@email.tld
+> click2stream-password: your_password
+> Content-Type: application/json
+{
+    "rtspPath": "rtsp:\/\/217.217.120.120:554\/axis-media\/media.amp",
+    "shortname": "testkamera",
+    "description": "description",
+    "gps": "N40.640368, W74.0853",
+    "tags": "Praha, Zizkov",
+    "player": {
+        "idPlayer":"1",
+        "idCamera":"1",
+        "shareTwitter":"0",
+        "shareFacebook":"0",
+        "sharePrivateLike":"0",
+        "shareEmail":"1",
+        "publicPageAddress":"test",
+        "displayName":"1",
+        "domainLock":"",
+        "playerSkin":"glow2",
+        "playerRatio":"4:3",
+        "playerWidth":"0",
+        "playerHeight":"0",
+        "timeSettingsFrom":"00:00:00",
+        "timeSettingsTo":"00:00:00",
+        "timeSettingsBehaviour":"blank",
+        "timeSettingsActive":"0",
+        "GACode":""
+    }
+}
+< 200
+< Content-Type: text/plain
+Camera updated.
+
+
+Add Camera
+-------------
+Use this method to add new camera object via PUT method
+PUT /camera
+> click2stream-user: your_account@email.tld
+> click2stream-password: your_password
+> Content-Type: application/json
+{
+    "rtspPath": "rtsp:\/\/217.217.120.123:554\/axis-media\/media.amp",
+    "shortname": "testkamera3",
+    "description": "description",
+    "gps": "N40.640368, W74.0853",
+    "tags": "Praha, Zizkov",
+}
+< 200
+< Content-Type: application/json
+{
+    "idCamera": "3",
+    "idUser": "1",
+    "rtspPath": "rtsp:\/\/217.217.120.123:554\/axis-media\/media.amp",
+    "shortname": "testkamera3",
+    "description": "description",
+    "gps": "N40.640368, W74.0853",
+    "tags": "Praha, Zizkov",
+    "watermark": "",
+    "publicPageAddress": "test",
+    "domainAlias": null,
+    "domainLock": "",
+    "shareTwitter": "1",
+    "shareFacebook": "1",
+    "sharePrivateLike": "1",
+    "shareEmail": "1",
+    "playerSkin": "glow",
+    "playerRatio": "16:9",
+    "displayName": "1",
+    "created": "2011-08-23 17:09:11",
+    "idPlan": "1"
+}
+
+
+Delete Camera
+-------------
+Use this method to remove/deactivate camera
+DELETE /camera/3
+> click2stream-user: your_account@email.tld
+> click2stream-password: your_password
+< 200
+< Content-Type: text/plain
+Camera with ID: 3 has been deactivated.
+
+
+--
+PLAYER OPERATIONS
+describes available operations with Player object API
+ADD operation is implemented but cannot be called by user as default player is created for each new camera and multiple players are not supported at the moment
+UPDATE operation can be called separately or as part of camera object
+
+Player properties
+-----------------
+- __idPlayer (int)__ - *__READ ONLY__ unique identifier of camera player object*
+- __idCamera (int)__ - *__READ ONLY__ unique identifier of camera object player belongs to*
+- __shareTwitter (int)__ - * shows/hides twitter button on player page* 
+- __shareFacebook (int)__ - * shows/hides FB like button on player page* 
+- __sharePrivateLike (int)__ - * shows/hides PrivateLike button on player page* 
+- __shareEmail (int)__ - * shows/hides Email button on player page* 
+- __publicPageAddress (string)__ - *public player domain name on click2stream domain (publicpageaddress.click2stream.com)*
+- __displayName (int)__ - * shows/hides player info such as shortname, description, tags* 
+- __domainAlias (string)__ - * FQDN for public player page of the camera stream ie. mycamera.dyndns.org*
+- __domainLock (string)__ - *__NOT-IMPLEMENTED__, domain name or names for player domain locking (wildcard supported)* 
+- __playerSkin (string)__ - * skin for player skin <see list of available skins>* 
+- __playerRatio (string)__ - * defines player ratio/resolution __(16:9, 4:3, custom are only available values)__* 
+- __playerWidth (int)__ - * defines player width in pixels* 
+- __playerHeight (int)__ - * defines player height in pixels* 
+- __logo (string)__ - * returns stream logo path (can be modified via C2S website, if set returns path relative to http://www.click2stream.com/)*
+- __nostreamImage (string)__ - * returns path to image displayed when camera stream is unavailable (can be modified via C2S website, if set returns path relative to http://www.click2stream.com/)*
+- __timeSettingsActive (int)__ - * activates camera time settings*
+- __timeSettingsFrom (string)__ - * defines time when camera starts streaming*
+- __timeSettingsTo (string)__ - * defines time when camera stops streaming*
+- __timeSettingsBehaviour (string)__ - * defines happens when camera is not streaming, available options are: 'blank' - displays blank scree, 'image' - displays uploaded image*
+- __timeSettingsImage (string)__ - * returns image path thats displayed when camera time settings are aplied and behaviour is set to 'image' (can be modified via C2S website, if set returns path relative to http://www.click2stream.com/)*
+- __GACode (string)__ - * defines Google Analytics code for player tracking, enter only GA identifier i.e. UA-ABC12345
+--
+Player list
+-----------
+Use this method to return list of all players bind to your Click2Stream account.
+GET /player
+> click2stream-user: your_account@email.tld
+> click2stream-password: your_password
+< 200
+< Content-Type: application/json
+[
+   {
+      "idPlayer":"1",
+      "idCamera":"1",
+      "shareTwitter":"0",
+      "shareFacebook":"0",
+      "sharePrivateLike":"0",
+      "shareEmail":"1",
+      "publicPageAddress":"test",
+      "displayName":"1",
+      "domainLock":"",
+      "playerSkin":"glow2",
+      "playerRatio":"4:3",
+      "playerWidth":"0",
+      "playerHeight":"0",
+      "timeSettingsFrom":"00:00:00",
+      "timeSettingsTo":"00:00:00",
+      "timeSettingsBehaviour":"blank",
+      "timeSettingsActive":"0",
+      "GACode":""
+   },
+   {
+      "idPlayer":"2",
+      "idCamera":"2",
+      "shareTwitter":"1",
+      "shareFacebook":"1",
+      "sharePrivateLike":"1",
+      "shareEmail":"1",
+      "publicPageAddress":"ahoj",
+      "displayName":"1",
+      "playerSkin":"",
+      "playerRatio":"",
+      "timeSettingsActive":"0"
+   },
+   {
+      "idPlayer":"3",
+      "idCamera":"3",
+      "logo":"\/uploaded\/hydrangeas-85.jpg",
+      "shareTwitter":"1",
+      "shareFacebook":"1",
+      "sharePrivateLike":"1",
+      "shareEmail":"1",
+      "publicPageAddress":"tester",
+      "displayName":"1",
+      "playerSkin":"glow",
+      "playerRatio":"4:3",
+      "playerWidth":"230",
+      "playerHeight":"100",
+      "timeSettingsFrom":"04:15:00",
+      "timeSettingsTo":"05:19:00",
+      "timeSettingsBehaviour":"image",
+      "timeSettingsActive":"1",
+      "timeSettingsImage":"\/uploaded\/koala.jpg",
+      "nostreamImage":"\/uploaded\/tulips-76.jpg",
+      "GACode":"UA-85544455"
+   }
+]
+
+
+Player detail
+-------------
+Use this method to return player data via GET method for idPlayer specified in URL
+GET /player/1
+> click2stream-user: your_account@email.tld
+> click2stream-password: your_password
+< 200
+< Content-Type: application/json
+{
+    "idPlayer":"1",
+    "idCamera":"1",
+    "shareTwitter":"0",
+    "shareFacebook":"0",
+    "sharePrivateLike":"0",
+    "shareEmail":"1",
+    "publicPageAddress":"test",
+    "displayName":"1",
+    "domainLock":"",
+    "playerSkin":"glow2",
+    "playerRatio":"4:3",
+    "playerWidth":"0",
+    "playerHeight":"0",
+    "timeSettingsFrom":"00:00:00",
+    "timeSettingsTo":"00:00:00",
+    "timeSettingsBehaviour":"blank",
+    "timeSettingsActive":"0",
+    "GACode":""
+}
+
+Update Player
+-------------
+Use this method to update Player data for via POST method for idPlayer specified in URL.
+POST /player/1
+> click2stream-user: your_account@email.tld
+> click2stream-password: your_password
+{
+    "idPlayer":"1",
+    "idCamera":"1",
+    "shareTwitter":"0",
+    "shareFacebook":"0",
+    "sharePrivateLike":"1",
+    "shareEmail":"1",
+    "publicPageAddress":"test",
+    "displayName":"1",
+    "domainLock":"",
+    "playerSkin":"glow2",
+    "playerRatio":"4:3",
+    "playerWidth":"0",
+    "playerHeight":"0",
+    "timeSettingsFrom":"00:00:00",
+    "timeSettingsTo":"00:00:00",
+    "timeSettingsBehaviour":"blank",
+    "timeSettingsActive":"0",
+    "GACode":""
+}
+< 200
+< Content-Type: text/plain
+Player updated.
+
+
+Add Player
+-------------
+__NOT SUPPORTED__ - Use this method to add new player object via PUT method
+PUT /player
+> click2stream-user: your_account@email.tld
+> click2stream-password: your_password
+> Content-Type: application/json
+{
+    "idPlayer":"4",
+    "idCamera":"1",
+    "shareTwitter":"0",
+    "shareFacebook":"0",
+    "sharePrivateLike":"1",
+    "shareEmail":"1",
+    "publicPageAddress":"test2",
+    "displayName":"1",
+    "domainLock":"",
+    "playerSkin":"glow2",
+    "playerRatio":"4:3",
+    "playerWidth":"0",
+    "playerHeight":"0",
+    "timeSettingsFrom":"00:00:00",
+    "timeSettingsTo":"00:00:00",
+    "timeSettingsBehaviour":"blank",
+    "timeSettingsActive":"0",
+    "GACode":""
+}
+< 403
+< Content-Type: text/plain
+Sorry but you can't make new player objects. Administrator permissions are required for this operation.
+
+
+Delete player
+-------------
+__NOT SUPPORTED__ - Use this method to remove/deactivate player
+DELETE /player/1
+> click2stream-user: your_account@email.tld
+> click2stream-password: your_password
+< 501
+< Content-Type: text/plain
+Deleting player is not supported.
+
+
+--
+LIST OF COUNTRIES
+
+* 0 - Afghanistan
+* 1 - Albania
+* 2 - Algeria
+* 3 - Andorra
+* 4 - Angola
+* 5 - Antigua and Barbuda
+* 6 - Argentina
+* 7 - Armenia
+* 8 - Australia
+* 9 - Austria
+* 10 - Azerbaijan
+* 11 - Bahamas
+* 12 - Bahrain
+* 13 - Bangladesh
+* 14 - Barbados
+* 15 - Belarus
+* 16 - Belgium
+* 17 - Belize
+* 18 - Benin
+* 19 - Bhutan
+* 20 - Bolivia
+* 21 - Bosnia and Herzegovina
+* 22 - Botswana
+* 23 - Brazil
+* 24 - Brunei
+* 25 - Bulgaria
+* 26 - Burkina Faso
+* 27 - Burundi
+* 28 - Cambodia
+* 29 - Cameroon
+* 30 - Canada
+* 31 - Cape Verde
+* 32 - Central African Republic
+* 33 - Chad
+* 34 - Chile
+* 35 - China
+* 36 - Colombi
+* 37 - Comoros
+* 38 - Congo (Brazzaville)
+* 39 - Congo
+* 40 - Costa Rica
+* 41 - Cote d'Ivoire
+* 42 - Croatia
+* 43 - Cuba
+* 44 - Cyprus
+* 45 - Czech Republic
+* 46 - Denmark
+* 47 - Djibouti
+* 48 - Dominica
+* 49 - Dominican Republic
+* 50 - East Timor (Timor Timur)
+* 51 - Ecuador
+* 52 - Egypt
+* 53 - El Salvador
+* 54 - Equatorial Guinea
+* 55 - Eritrea
+* 56 - Estonia
+* 57 - Ethiopia
+* 58 - Fiji
+* 59 - Finland
+* 60 - France
+* 61 - Gabon
+* 62 - Gambia
+* 63 - The
+* 64 - Georgia
+* 65 - Germany
+* 66 - Ghana
+* 67 - Greece
+* 68 - Grenada
+* 69 - Guatemala
+* 70 - Guinea
+* 71 - Guinea-Bissau
+* 72 - Guyana
+* 73 - Haiti
+* 74 - Honduras
+* 75 - Hungary
+* 76 - Iceland
+* 77 - India
+* 78 - Indonesia
+* 79 - Iran
+* 80 - Iraq
+* 81 - Ireland
+* 82 - Israel
+* 83 - Italy
+* 84 - Jamaica
+* 85 - Japan
+* 86 - Jordan
+* 87 - Kazakhstan
+* 88 - Kenya
+* 89 - Kiribati
+* 90 - Korea
+* 91 - North
+* 92 - Korea
+* 93 - South
+* 94 - Kuwait
+* 95 - Kyrgyzstan
+* 96 - Laos
+* 97 - Latvia
+* 98 - Lebanon
+* 99 - Lesotho
+* 100 - Liberia
+* 101 - Libya
+* 102 - Liechtenstein
+* 103 - Lithuania
+* 104 - Luxembourg
+* 105 - Macedonia
+* 106 - Madagascar
+* 107 - Malawi
+* 108 - Malaysia
+* 109 - Maldives
+* 110 - Mali
+* 111 - Malta
+* 112 - Marshall Islands
+* 113 - Mauritania
+* 114 - Mauritius
+* 115 - Mexico
+* 116 - Micronesia
+* 117 - Moldova
+* 118 - Monaco
+* 119 - Mongolia
+* 120 - Morocco
+* 121 - Mozambique
+* 122 - Myanmar
+* 123 - Namibia
+* 124 - Nauru
+* 125 - Nepa
+* 126 - Netherlands
+* 127 - New Zealand
+* 128 - Nicaragua
+* 129 - Niger
+* 130 - Nigeria
+* 131 - Norway
+* 132 - Oman
+* 133 - Pakistan
+* 134 - Palau
+* 135 - Panama
+* 136 - Papua New Guinea
+* 137 - Paraguay
+* 138 - Peru
+* 139 - Philippines
+* 140 - Poland
+* 141 - Portugal
+* 142 - Qatar
+* 143 - Romania
+* 144 - Russia
+* 145 - Rwanda
+* 146 - Saint Kitts and Nevis
+* 147 - Saint Lucia
+* 148 - Saint Vincent
+* 149 - Samoa
+* 150 - San Marino
+* 151 - Sao Tome and Principe
+* 152 - Saudi Arabia
+* 153 - Senegal
+* 154 - Serbia and Montenegro
+* 155 - Seychelles
+* 156 - Sierra Leone
+* 157 - Singapore
+* 158 - Slovakia
+* 159 - Slovenia
+* 160 - Solomon Islands
+* 161 - Somalia
+* 162 - South Africa
+* 163 - Spain
+* 164 - Sri Lanka
+* 165 - Sudan
+* 166 - Suriname
+* 167 - Swaziland
+* 168 - Sweden
+* 169 - Switzerland
+* 170 - Syria
+* 171 - Taiwan
+* 172 - Tajikistan
+* 173 - Tanzania
+* 174 - Thailand
+* 175 - Togo
+* 176 - Tonga
+* 177 - Trinidad and Tobago
+* 178 - Tunisia
+* 179 - Turkey
+* 180 - Turkmenistan
+* 181 - Tuvalu
+* 182 - Uganda
+* 183 - Ukraine
+* 184 - United Arab Emirates
+* 185 - United Kingdom
+* 186 - United States
+* 187 - Uruguay
+* 188 - Uzbekistan
+* 189 - Vanuatu
+* 190 - Vatican City
+* 191 - Venezuela
+* 192 - Vietnam
+* 193 - Yemen
+* 194 - Zambia
+* 195 - Zimbabwe
+--
+
+
+--
+LIST OF STATES
+
+* 0 - Not USA 
+* 1 - Alabama 
+* 2 - Alaska 
+* 3 - Arizona 
+* 4 - Arkansas 
+* 5 - California 
+* 6 - Colorado 
+* 7 - Connecticut
+* 8 - Delaware 
+* 9 - District Of Columbia 
+* 10 - Florida 
+* 11 - Georgia 
+* 12 - Hawaii 
+* 13 - Idaho 
+* 14 - Illinois 
+* 15 - Indiana 
+* 16 - Iowa 
+* 17 - Kansas
+* 18 - Kentucky 
+* 19 - Louisiana 
+* 20 - Maine 
+* 21 - Maryland 
+* 22 - Massachusetts 
+* 23 - Michigan 
+* 24 - Minnesota 
+* 25 - Mississippi 
+* 26 - Missouri
+* 27 - Montana 
+* 28 - Nebraska 
+* 29 - Nevada 
+* 30 - New Hampshire 
+* 31 - New Jersey 
+* 32 - New Mexico 
+* 33 - New York 
+* 34 - North Carolina 
+* 35 - North Dakota
+* 36 - Ohio 
+* 37 - Oklahoma 
+* 38 - Oregon 
+* 39 - Pennsylvania 
+* 40 - Rhode Island 
+* 41 - South Carolina 
+* 42 - South Dakota 
+* 43 - Tennessee 
+* 44 - Texas 
+* 45 - Utah
+* 46 - Vermont 
+* 47 - Virginia 
+* 48 - Washington 
+* 49 - West Virginia 
+* 50 - Wisconsin 
+* 51 - Wyoming
+--
+
+
+--
+LIST OF SKINS
+
+* bekle
+* bluemetal
+* click2stream (recommended)
+* dangdang
+* glow
+* glow2
+* grungetape
+* modieus
+* schoon
+--
+
+
+--
+API PLAN FEATURES PERMISSIONS
+describes write/read permissions for API for each plan
+
+<table>
+    <th>
+        <td>API object::property</td>
+        <td>Free plan (id_plan = 1)</td>
+        <td>Standart plan (id_plan = 2)</td>
+        <td>Premium plan (id_plan = 3)</td>
+        <td>Private plan (id_plan = 4)</td>
+    </tr>
+    <tr>
+        <td>Camera::idCamera</td>
+        <td>Read</td>
+        <td>Read</td>
+        <td>Read</td>
+        <td>Read</td>
+    </tr>
+    <tr>
+        <td>Camera::idUser</td>
+        <td>Read</td>
+        <td>Read</td>
+        <td>Read</td>
+        <td>Read</td>
+    </tr>
+    <tr>
+        <td>Camera::rtspPath</td>
+        <td>Read/Write</td>
+        <td>Read/Write</td>
+        <td>Read/Write</td>
+        <td>Read/Write</td>
+    </tr>
+    <tr>
+        <td>Camera::shortname</td>
+        <td>Read/Write</td>
+        <td>Read/Write</td>
+        <td>Read/Write</td>
+        <td>Read/Write</td>
+    </tr>
+    <tr>
+        <td>Camera::description</td>
+        <td>Read/Write</td>
+        <td>Read/Write</td>
+        <td>Read/Write</td>
+        <td>Read/Write</td>
+    </tr>
+    <tr>
+        <td>Camera::tags</td>
+        <td>Read/Write</td>
+        <td>Read/Write</td>
+        <td>Read/Write</td>
+        <td>Read/Write</td>
+    </tr>
+    <tr>
+        <td>Camera::created</td>
+        <td>Read</td>
+        <td>Read</td>
+        <td>Read</td>
+        <td>Read</td>
+    </tr>
+    <tr>
+        <td>Camera::timezone</td>
+        <td>Read/Write</td>
+        <td>Read/Write</td>
+        <td>Read/Write</td>
+        <td>Read/Write</td>
+    </tr>
+    <tr>
+        <td>Camera::active</td>
+        <td>Read</td>
+        <td>Read</td>
+        <td>Read</td>
+        <td>Read</td>
+    </tr>
+    <tr>
+        <td>Camera::player</td>
+        <td>Read/Write</td>
+        <td>Read/Write</td>
+        <td>Read/Write</td>
+        <td>Read/Write</td>
+    </tr>
+    <tr>
+        <td>Camera::id_plan</td>
+        <td>Read</td>
+        <td>Read</td>
+        <td>Read</td>
+        <td>Read</td>
+    </tr>
+</table> 
+--
+
+
+
+
+
+
+
+
+
+
+
+
+
+
